@@ -1,19 +1,24 @@
 import re
 
 
-class StaticRoutes():
+class StaticRoutes(object):
 
-    @property
-    def routes(self):
-        return self._routes
-
-    @routes.setter
-    def routes(self, value):
-
-
-    
     def __init__(self):
         self._routes = list()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        pass
+
+    def append(self, value):
+        value.set_route()
+        self._routes.append(value)
+
+    def remove(self, index):
+        self._routes[index].unset_route()
+        self._routes.remove(index)
 
 
 class StaticRoute(object):
@@ -27,7 +32,7 @@ class StaticRoute(object):
         'route_command': 'route {0} {1} {2} {3}', 'get_routes': 'show run route'
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self._id = self._set_class_count_varibale()
 
         self._raw_configuration = None
