@@ -30,7 +30,8 @@ class StaticRoutes(object):
         :param route: StaticRoute
         :return:
         """
-        route.set_route()
+        if type(route) != StaticRoute:
+            raise TypeError
         self._routes.append(route)
 
     def remove(self, index):
@@ -51,7 +52,7 @@ class StaticRoute(object):
         'route_command': 'route {0} {1} {2} {3}', 'get_routes': 'show run route'
     }
 
-    def __init__(self, interface=None, network=None, next_hop=None):
+    def __init__(self, parent, interface=None, network=None, next_hop=None):
         """
             This is the object that represents the static route on the Asa device.
 
@@ -65,6 +66,7 @@ class StaticRoute(object):
         :param next_hop: IpAddress
         """
         self._id = self._set_class_count_varibale()
+        self._parent = parent
 
         self._raw_configuration = None
         self._interface = None
@@ -78,7 +80,7 @@ class StaticRoute(object):
 
     def _get_route(self):
         return re.findall(
-            'route (.*)', self.ssh_session.send_command(self.STATIC_ROUTE_COMMANDS['get_routes'])
+            'route (.*)', self._parent.ssh_session.send_command(self.STATIC_ROUTE_COMMANDS['get_routes'])
         )[self._id]
 
     def _parse_route(self):
@@ -89,14 +91,14 @@ class StaticRoute(object):
             Method to set the route on the device , this should only be called once.
         :return:
         """
-        self._set_config_mode()
-        self.ssh_session.send_command(
+        self._parent._set_config_mode()
+        self._parent.ssh_session.send_command(
             self.STATIC_ROUTE_COMMANDS['route_command'].format(
                 self._interface, str(self._ip_network.ip), str(self._ip_network.netmask),
                 str(self._forwarding_address.ip)
             )
         )
-        self._unset_config_mode()
+        self._parent._unset_config_mode()
 
     def unset_route(self):
         """
@@ -104,11 +106,11 @@ class StaticRoute(object):
             so that the Asa class stays in sync with the device.
         :return:
         """
-        self._set_config_mode()
-        self.ssh_session.send_command(
+        self._parent._set_config_mode()
+        self._parent.ssh_session.send_command(
             'no ' + self.STATIC_ROUTE_COMMANDS['route_command'].format(
                 self._interface, str(self._ip_network.ip), str(self._ip_network.netmask),
                 str(self._forwarding_address.ip)
             )
         )
-        self._unset_config_mode()
+        self._parent._unset_config_mode()

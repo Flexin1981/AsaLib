@@ -54,4 +54,4 @@ class Asa(AsaBase):
 
     def get_static_routes(self):
         for _ in re.findall('route .* 1', self._raw_configuration):
-            self.static_routes.append(StaticRoute())
+            self.static_routes.append(StaticRoute(self))
