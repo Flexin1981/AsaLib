@@ -3,6 +3,8 @@ import re
 
 class StaticRoutes(object):
 
+    generator = None
+
     def __init__(self):
         """
             List style object to hold all the static routes on the device.
@@ -10,10 +12,17 @@ class StaticRoutes(object):
         self._routes = list()
 
     def __iter__(self):
+        self.generator = None
         return self
 
     def next(self):
-        pass
+        if not self.generator:
+            self.generator = self._gen()
+        return self.generator.next()
+
+    def _gen(self):
+        for item in self._routes:
+            yield item
 
     def append(self, route):
         """
