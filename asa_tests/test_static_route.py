@@ -9,7 +9,7 @@ Asa.Ssh = MockSsh
 from asa_modules.routing.static_route import StaticRoute
 
 
-class TestAsaStaticRoute(unittest.TestCase):
+class TestAsaStaticRoutes(unittest.TestCase):
 
     def setUp(self):
         self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw')
