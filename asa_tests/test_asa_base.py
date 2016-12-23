@@ -11,7 +11,7 @@ class TestAsaBase(unittest.TestCase):
 
     def setUp(self):
 
-        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw')
+        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
         # self.asa.ssh_session = MockSsh('192.168.0.1', 'john', 'uber_secure_pw')
 
     def test_hostname(self):
@@ -33,6 +33,3 @@ class TestAsaBase(unittest.TestCase):
         self.assertEquals(
             'test_hostname', self.asa.hostname
         )
-
-
-        

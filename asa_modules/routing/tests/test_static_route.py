@@ -12,7 +12,7 @@ from asa_modules.routing.static_route import StaticRoute
 class TestAsaStaticRoutes(unittest.TestCase):
 
     def setUp(self):
-        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw')
+        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
 
     def test_static_route_fails_if_not_static_route_type(self):
         with self.assertRaises(TypeError):

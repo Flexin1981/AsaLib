@@ -1,4 +1,9 @@
+from netaddr import IPNetwork
 
 
 class AccessList(object):
-    pass
+
+    def __init__(self, source_network=None, dest_network=None):
+        pass
+
+

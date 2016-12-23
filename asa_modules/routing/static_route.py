@@ -98,7 +98,7 @@ class StaticRoute(object):
                 str(self._forwarding_address.ip)
             )
         )
-        self._parent._unset_config_mode()
+        self._parent.unset_config_mode()
 
     def unset_route(self):
         """
@@ -113,4 +113,4 @@ class StaticRoute(object):
                 str(self._forwarding_address.ip)
             )
         )
-        self._parent._unset_config_mode()
+        self._parent.unset_config_mode()
