@@ -1,27 +1,3 @@
-
-
-class MockSsh(object):
-
-    def __init__(self, hostname, username, password):
-        self.hostname = hostname
-        self.username = username
-        self.password = password
-
-    def send_command(self, command, results=True):
-        if command == 'show run':
-            return sample_config
-        elif command == 'show run hostname':
-            return 'test_hostname'
-        elif command == 'show run route':
-            return """route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1"""
-
-    def login(self):
-        pass
-
-    def is_logged_in(self):
-        return True
-
-
 sample_config = """
 ASA Version 7.2(3)
 !
@@ -179,3 +155,28 @@ group-policy DfltGrpPolicy attributes
  nac-default-acl none
  address-pools none
 """
+
+
+class MockSsh(object):
+
+    COMMANDS = {
+        '': '', 'enable': 'password: ', 'terminal pager 0': '', 'disable': '', 'show run': sample_config,
+        'show run hostname': 'test_hostname', 'write memory': 'written',
+        'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1"
+    }
+
+    def __init__(self, hostname, username, password):
+        self.hostname = hostname
+        self.username = username
+        self.password = password
+
+    def send_command(self, command, results=True):
+        return self.COMMANDS[command]
+
+    def login(self):
+        pass
+
+    def is_logged_in(self):
+        return True
+
+
