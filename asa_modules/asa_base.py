@@ -50,4 +50,6 @@ class AsaBase(object):
         self.ssh_session.send_command(self.COMMAND_LIST['end_config_mode'])
 
     def save_running_configuration(self):
-        self.ssh_session.send_command(self.COMMAND_LIST['save_config'])
+        if not self.is_enable_mode():
+            self.set_enable_mode()
+        return self.ssh_session.send_command(self.COMMAND_LIST['save_config'])

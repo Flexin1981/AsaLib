@@ -43,3 +43,13 @@ class TestAsaBase(unittest.TestCase):
         self.assertEquals(
             False, self.asa.unset_enable_mode()
         )
+
+    def test_is_enable_returns_bool(self):
+        self.assertEquals(
+            bool, type(self.asa.is_enable_mode())
+        )
+
+    def test_write_config_sends_save_command(self):
+        self.assertEquals(
+            'written', self.asa.save_running_configuration()
+        )
