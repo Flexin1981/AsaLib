@@ -15,6 +15,12 @@ class MockSsh(object):
         elif command == 'show run route':
             return """route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1"""
 
+    def login(self):
+        pass
+
+    def is_logged_in(self):
+        return True
+
 
 sample_config = """
 ASA Version 7.2(3)

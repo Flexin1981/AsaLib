@@ -11,8 +11,11 @@ class TestAsaBase(unittest.TestCase):
 
     def setUp(self):
 
-        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw')
-        # self.asa.ssh_session = MockSsh('192.168.0.1', 'john', 'uber_secure_pw')
+        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
+        self.asa.login()
+        self.asa.set_enable_mode()
+        self.asa.set_terminal_pager(0)
+        self.asa.get_configuration()
 
     def test_hostname(self):
         self.assertEquals(
@@ -29,10 +32,14 @@ class TestAsaBase(unittest.TestCase):
             'uber_secure_pw', self.asa.ssh_session.password
         )
 
-    def test_host_name_returns_string(self):
+    def test_set_enable_call(self):
+        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
+        self.asa.login()
         self.assertEquals(
-            'test_hostname', self.asa.hostname
+            True, self.asa.set_enable_mode()
         )
 
-
-        
+    def test_unset_enable_call(self):
+        self.assertEquals(
+            False, self.asa.unset_enable_mode()
+        )
