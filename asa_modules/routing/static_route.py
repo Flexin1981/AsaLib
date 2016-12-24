@@ -24,6 +24,14 @@ class StaticRoutes(object):
         for item in self._routes:
             yield item
 
+    def _track_positions(self):
+        for num, item in enumerate(self._routes):
+            item._pos = num
+
+    @staticmethod
+    def _set_route_device(route):
+        route.set_route()
+
     def append(self, route):
         """
             Add a route to the device.
@@ -32,6 +40,7 @@ class StaticRoutes(object):
         """
         if type(route) != StaticRoute:
             raise TypeError
+        self._set_route_device(route)
         self._routes.append(route)
 
     def remove(self, index):
@@ -46,8 +55,6 @@ class StaticRoutes(object):
 
 class StaticRoute(object):
 
-    INDEXES = 0
-
     STATIC_ROUTE_COMMANDS = {
         'route_command': 'route {0} {1} {2} {3}', 'get_routes': 'show run route'
     }
@@ -55,6 +62,13 @@ class StaticRoute(object):
     def __init__(self, parent, interface=None, network=None, next_hop=None):
         """
             This is the object that represents the static route on the Asa device.
+
+            You can add routes to the device in one of the following way;
+
+            After Creating the Asa Device, logging in etc.
+
+                route = StaticRoute(<route details>)
+                asa.static_routes.append(route)
 
             One thing to note on this is that the routes are tracking the route that they maintain by a counter on this
             class, I should change this to ensure that the counter stays in sync with deletions, but have not done so
@@ -65,23 +79,30 @@ class StaticRoute(object):
         :param network: IpNetwork
         :param next_hop: IpAddress
         """
-        self._id = self._set_class_count_varibale()
+        self._pos = None
         self._parent = parent
 
         self._raw_configuration = None
-        self._interface = None
-        self._ip_network = None
-        self._forwarding_address = None
+        self._interface = self._check_type_interface_name(interface)
+        self._ip_network = network
+        self._forwarding_address = next_hop
 
     @staticmethod
-    def _set_class_count_varibale():
-        StaticRoute.INDEXES += 1
-        return StaticRoute.INDEXES
+    def _check_type_interface_name(interface):
+        from asa_modules.asa_interface import AsaInterface
+        if type(interface) == str:
+            return interface
+        elif type(interface) == AsaInterface:
+            return str(interface)
+        elif interface is None:
+            return None
+        else:
+            raise TypeError
 
     def _get_route(self):
         return re.findall(
             'route (.*)', self._parent.ssh_session.send_command(self.STATIC_ROUTE_COMMANDS['get_routes'])
-        )[self._id]
+        )[self.pos]
 
     def _parse_route(self):
         pass
@@ -91,11 +112,11 @@ class StaticRoute(object):
             Method to set the route on the device , this should only be called once.
         :return:
         """
-        self._parent._set_config_mode()
+        self._parent.set_config_mode()
         self._parent.ssh_session.send_command(
             self.STATIC_ROUTE_COMMANDS['route_command'].format(
                 self._interface, str(self._ip_network.ip), str(self._ip_network.netmask),
-                str(self._forwarding_address.ip)
+                str(self._forwarding_address)
             )
         )
         self._parent.unset_config_mode()
@@ -106,7 +127,7 @@ class StaticRoute(object):
             so that the Asa class stays in sync with the device.
         :return:
         """
-        self._parent._set_config_mode()
+        self._parent.set_config_mode()
         self._parent.ssh_session.send_command(
             'no ' + self.STATIC_ROUTE_COMMANDS['route_command'].format(
                 self._interface, str(self._ip_network.ip), str(self._ip_network.netmask),

@@ -64,8 +64,7 @@ class Asa(AsaBase):
         }
 
     def get_static_routes(self):
-        for _ in re.findall('route .* 1', self._raw_configuration):
-            self.static_routes.append(StaticRoute(self))
+        self.static_routes._routes = [StaticRoute(self) for _ in re.findall('route .* 1', self._raw_configuration)]
 
     def get_users(self):
         for _ in re.findall('username .*', self._raw_configuration):
