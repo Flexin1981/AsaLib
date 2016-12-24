@@ -10,7 +10,7 @@ class AsaBase(object):
     COMMAND_LIST = {
         'config_mode': 'config terminal', 'end_config_mode': 'end',
         'get_hostname': 'show run hostname', 'save_config': 'write memory', 'pager_command': 'terminal pager {0}',
-        'enable': 'enable', 'diable': 'disable'
+        'enable': 'enable', 'disable': 'disable'
     }
 
     def __init__(self, hostname, username, password, enable):
@@ -28,11 +28,13 @@ class AsaBase(object):
             self.ssh_session.send_command(self.COMMAND_LIST['enable'])
             self.ssh_session.send_command(self.enable)
             self._enable_set = True
+        return self._enable_set
 
     def unset_enable_mode(self):
         if self.ssh_session.is_logged_in():
             self.ssh_session.send_command(self.COMMAND_LIST['disable'])
             self._enable_set = False
+        return self._enable_set
 
     def is_enable_mode(self):
         return self._enable_set

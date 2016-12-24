@@ -31,3 +31,15 @@ class TestAsaBase(unittest.TestCase):
         self.assertEquals(
             'uber_secure_pw', self.asa.ssh_session.password
         )
+
+    def test_set_enable_call(self):
+        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
+        self.asa.login()
+        self.assertEquals(
+            True, self.asa.set_enable_mode()
+        )
+
+    def test_unset_enable_call(self):
+        self.assertEquals(
+            False, self.asa.unset_enable_mode()
+        )
