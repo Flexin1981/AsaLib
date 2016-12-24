@@ -1,6 +1,7 @@
 from asa_modules.asa_base import AsaBase
 from asa_modules.asa_interface import AsaInterfaces, AsaInterface
 from asa_modules.routing.static_route import StaticRoutes, StaticRoute
+from asa_modules.asa_users import AsaUsers, AsaUser
 import re
 
 
@@ -29,21 +30,31 @@ class Asa(AsaBase):
             self.get_static_routes()
         return self._static_routes
 
+    @property
+    def users(self):
+        if not self._users:
+            self._users = AsaUsers()
+            self.get_users()
+        return self._users
+
     def __init__(self, hostname, username, password, enable):
         super(Asa, self).__init__(hostname, username, password, enable)
         self._interfaces = None
         self._static_routes = None
+        self._users = None
 
-
+        self._raw_configuration = None
 
     def get_configuration(self):
         self._raw_configuration = self.ssh_session.send_command(self.ASA_COMMANDS['get_running_configuration'])
 
     def get_hostname(self):
-        self._hostname = self.ssh_session.send_command(self.COMMAND_LIST['get_hostname'])
+        self._hostname = re.search(
+            'hostname[\s](.*)', self.ssh_session.send_command(self.COMMAND_LIST['get_hostname'])
+        ).group(1)
 
     def set_hostname(self, hostname):
-        self._set_config_mode()
+        self.set_config_mode()
         self.ssh_session.send_command(hostname)
         self.unset_config_mode()
 
@@ -56,6 +67,10 @@ class Asa(AsaBase):
         for _ in re.findall('route .* 1', self._raw_configuration):
             self.static_routes.append(StaticRoute(self))
 
+    def get_users(self):
+        for _ in re.findall('username .*', self._raw_configuration):
+            self.users.append(AsaUser(self))
+
 
 if __name__ == '__main__':
     asa = Asa('10.0.0.1', 'john', 'john', '')
@@ -64,4 +79,6 @@ if __name__ == '__main__':
     asa.set_terminal_pager(0)
     asa.get_configuration()
 
-    print asa.interfaces._interfaces[0].ip_address
+    asa.get_hostname()
+    print asa.hostname
+

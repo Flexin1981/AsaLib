@@ -63,6 +63,10 @@ class Ssh(object):
 
         return return_buffer
 
+    @staticmethod
+    def _clean_command(command, result_string):
+        return result_string.replace(command, '')
+
     def send_command(self, command, results=True):
         if not self.is_logged_in():
             raise NotLoggedInError()
@@ -70,7 +74,7 @@ class Ssh(object):
         self._write_to_channel(command)
 
         if results:
-            return self._read_from_channel()
+            return self._clean_command(command, self._read_from_channel())
 
     def send_commands(self, commands, results=True):
         command_results_list = []
