@@ -1,8 +1,9 @@
+import re
+
 from asa_modules.asa_base import AsaBase
 from asa_modules.asa_interface import AsaInterfaces, AsaInterface
 from asa_modules.routing.static_route import StaticRoutes, StaticRoute
-from asa_modules.asa_users import AsaUsers, AsaUser
-import re
+from asa_modules.users.asa_users import AsaUsers, AsaUser
 
 
 class Asa(AsaBase):

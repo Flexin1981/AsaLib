@@ -164,7 +164,8 @@ class MockSsh(object):
         'show run hostname': 'test_hostname', 'write memory': 'written', 'config terminal': '',
         'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1",
         'route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
-        'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': ''
+        'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
+        'username john password uber_pw privilage 15': '', 'no username john password uber_pw privilage 15': ''
     }
 
     def __init__(self, hostname, username, password):

@@ -12,13 +12,14 @@ class AsaUsers(object):
 
     def append(self, value):
         if type(value) != AsaUser:
-            raise TypeError
-
+            raise TypeError('User should be AsaUser Type')
+        value.set_user()
         self._users.append(value)
         self._track_positions()
 
     def remove(self, index):
-        self._users.remove(index)
+        self._users[index].unset_user()
+        del self._users[index]
         self._track_positions()
 
 
@@ -49,9 +50,14 @@ class AsaUser(object):
 
     def set_user(self):
         self._parent.set_config_mode()
-        self._parent.ssh_session.send_command(self.ASA_USERNAME_COMMANDS['username'].format())
+        self._parent.ssh_session.send_command(
+            self.ASA_USERNAME_COMMANDS['username'].format(self._username, self._password, str(self._privilege))
+        )
         self._parent.unset_config_mode()
 
     def unset_user(self):
-        pass
-
+        self._parent.set_config_mode()
+        self._parent.ssh_session.send_command(
+            'no ' + self.ASA_USERNAME_COMMANDS['username'].format(self._username, self._password, str(self._privilege))
+        )
+        self._parent.unset_config_mode()
