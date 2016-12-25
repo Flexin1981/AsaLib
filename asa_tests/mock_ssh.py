@@ -160,9 +160,11 @@ group-policy DfltGrpPolicy attributes
 class MockSsh(object):
 
     COMMANDS = {
-        '': '', 'enable': 'password: ', 'terminal pager 0': '', 'disable': '', 'show run': sample_config,
-        'show run hostname': 'test_hostname', 'write memory': 'written',
-        'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1"
+        '': '', 'enable': 'password: ', 'terminal pager 0': '', 'disable': '', 'show run': sample_config, 'end': '',
+        'show run hostname': 'test_hostname', 'write memory': 'written', 'config terminal': '',
+        'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1",
+        'route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
+        'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': ''
     }
 
     def __init__(self, hostname, username, password):

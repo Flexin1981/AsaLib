@@ -57,6 +57,9 @@ class AsaInterface:
         self._name_if = None
         self._status = None
 
+    def __str__(self):
+        return self.name_if
+
     def _set_interface_configuration_mode(self):
         self._set_config_mode()
         self.ssh_session.send_command(self.INTERFACE_COMMANDS['interface_configuration_mode'].format(self._id))
