@@ -50,7 +50,7 @@ class StaticRoutes(object):
         :return:
         """
         self._routes[index].unset_route()
-        self._routes.remove(index)
+        del self._routes[index]
 
 
 class StaticRoute(object):
@@ -131,7 +131,7 @@ class StaticRoute(object):
         self._parent.ssh_session.send_command(
             'no ' + self.STATIC_ROUTE_COMMANDS['route_command'].format(
                 self._interface, str(self._ip_network.ip), str(self._ip_network.netmask),
-                str(self._forwarding_address.ip)
+                str(self._forwarding_address)
             )
         )
         self._parent.unset_config_mode()

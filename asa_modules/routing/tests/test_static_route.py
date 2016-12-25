@@ -29,3 +29,13 @@ class TestAsaStaticRoutes(unittest.TestCase):
         self.assertEquals(
             length_before_test + 1, len(self.asa.static_routes._routes)
         )
+
+    def test_removing_static_route(self):
+        self.asa.static_routes.append(
+            StaticRoute(self.asa, 'outside', IPNetwork('192.168.1.0/24'), IPAddress('192.168.0.254'))
+        )
+        length_before_test = len(self.asa.static_routes._routes)
+        self.asa.static_routes.remove(1)
+        self.assertEquals(
+            length_before_test - 1, len(self.asa.static_routes._routes)
+        )
