@@ -9,7 +9,7 @@ from asa_modules.users.asa_users import AsaUsers, AsaUser
 class Asa(AsaBase):
 
     ASA_COMMANDS = {
-        'get_running_configuration': 'show run'
+        'get_running_configuration': 'show run', 'reload': 'reload {0} noconfirm', 'cancel_reload': 'reload cancel'
     }
 
     @property
@@ -67,14 +67,20 @@ class Asa(AsaBase):
     def get_users(self):
         self.users.get()
 
+    def reload(self, delay_time=0):
+        """
+            Reload the device with an optional delay in seconds
+        :param delay_time:
+        :return:
+        """
+        hours, minutes = divmod(delay_time, 60)
+        self.ssh_session.send_command(self.ASA_COMMANDS['reload'].format(str(hours) + ':' + str(minutes)))
+        return True
 
-if __name__ == '__main__':
-    asa = Asa('10.0.0.1', 'john', 'john', '')
-    asa.login()
-    asa.set_enable_mode()
-    asa.set_terminal_pager(0)
-    asa.get_configuration()
-
-    asa.get_hostname()
-    print asa.hostname
-
+    def cancel_reload(self):
+        """
+            Cancel a Delayed reload.
+        :return:
+        """
+        self.ssh_session.send_command(self.ASA_COMMANDS['cancel_reload'])
+        return True
