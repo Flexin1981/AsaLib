@@ -9,7 +9,7 @@ from asa_modules.users.asa_users import AsaUsers, AsaUser
 class Asa(AsaBase):
 
     ASA_COMMANDS = {
-        'get_running_configuration': 'show run', 'reload': 'reload {0} noconfirm', 'cancel_reload': 'reload cancel'
+        'get_running_configuration': 'show run', 'reload': 'reload in {0} noconfirm', 'cancel_reload': 'reload cancel'
     }
 
     @property
