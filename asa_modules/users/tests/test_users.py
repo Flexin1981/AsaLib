@@ -22,6 +22,7 @@ class TestAsaUsers(unittest.TestCase):
             self.asa.users.append('')
 
     def test_append_increases_length_of_object(self):
+        self.asa.get_users()
         length_before_test = len(self.asa.users._users)
         self.asa.users.append(
             AsaUser(self.asa, 'john', 'uber_pw', 15)
@@ -31,6 +32,7 @@ class TestAsaUsers(unittest.TestCase):
         )
 
     def test_length_of_array_decreases(self):
+        self.asa.get_users()
         self.asa.users.append(
             AsaUser(self.asa, 'john', 'uber_pw', 15)
         )

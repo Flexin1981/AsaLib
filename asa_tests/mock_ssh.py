@@ -157,23 +157,46 @@ group-policy DfltGrpPolicy attributes
 """
 
 
+class MockUsernames(object):
+
+    def __init__(self):
+        self.users = [
+            'username john password uber_pw privilage 15'
+        ]
+
+    def remove(self, user):
+        self.users.remove(user.replace('no ', ''))
+
+    def __str__(self):
+        return '/n'.join(self.users)
+
+
 class MockSsh(object):
 
-    COMMANDS = {
-        '': '', 'enable': 'password: ', 'terminal pager 0': '', 'disable': '', 'show run': sample_config, 'end': '',
-        'show run hostname': 'test_hostname', 'write memory': 'written', 'config terminal': '',
-        'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1",
-        'route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
-        'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
-        'username john password uber_pw privilage 15': '', 'no username john password uber_pw privilage 15': ''
-    }
-
     def __init__(self, hostname, username, password):
+        self.sample_config = sample_config
+        self.usernames = MockUsernames()
+        self.COMMANDS = {
+            '': '', 'enable': 'password: ', 'terminal pager 0': '', 'disable': '', 'show run': self.sample_config,
+            'end': '', 'show run hostname': 'test_hostname', 'write memory': 'written', 'config terminal': '',
+            'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1",
+            'route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
+            'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
+            'show run usernames': self._get_usernames,
+            'username john password uber_pw privilage 15': self.usernames.users.append,
+            'no username john password uber_pw privilage 15': self.usernames.remove
+        }
+
         self.hostname = hostname
         self.username = username
         self.password = password
 
+    def _get_usernames(self, _):
+        return str(self.usernames)
+
     def send_command(self, command, results=True):
+        if callable(self.COMMANDS[command]):
+            return self.COMMANDS[command](command)
         return self.COMMANDS[command]
 
     def login(self):

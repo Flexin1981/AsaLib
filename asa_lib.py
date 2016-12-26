@@ -33,16 +33,13 @@ class Asa(AsaBase):
 
     @property
     def users(self):
-        if not self._users:
-            self._users = AsaUsers()
-            self.get_users()
         return self._users
 
     def __init__(self, hostname, username, password, enable):
         super(Asa, self).__init__(hostname, username, password, enable)
         self._interfaces = None
         self._static_routes = None
-        self._users = None
+        self._users = AsaUsers(self)
 
         self._raw_configuration = None
 
@@ -68,8 +65,7 @@ class Asa(AsaBase):
         self.static_routes._routes = [StaticRoute(self) for _ in re.findall('route .* 1', self._raw_configuration)]
 
     def get_users(self):
-        for _ in re.findall('username .*', self._raw_configuration):
-            self.users.append(AsaUser(self))
+        self.users.get()
 
 
 if __name__ == '__main__':
