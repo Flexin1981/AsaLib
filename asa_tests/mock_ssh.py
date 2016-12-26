@@ -184,7 +184,8 @@ class MockSsh(object):
             'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
             'show run usernames': self._get_usernames,
             'username john password uber_pw privilage 15': self.usernames.users.append,
-            'no username john password uber_pw privilage 15': self.usernames.remove
+            'no username john password uber_pw privilage 15': self.usernames.remove,
+            'reload 0:0 noconfirm': '', 'reload cancel': ''
         }
 
         self.hostname = hostname
