@@ -26,3 +26,13 @@ class TestAsa(unittest.TestCase):
         self.assertEquals(
             True, self.asa.cancel_reload()
         )
+
+    def test_get_enable_password(self):
+        self.assertEquals(
+            'enable password GDHAGRHERH', self.asa.get_enable_password()
+        )
+
+    def test_set_enable_password(self):
+        self.assertEquals(
+            True, self.asa.set_enable_password('blah')
+        )

@@ -185,7 +185,8 @@ class MockSsh(object):
             'show run usernames': self._get_usernames,
             'username john password uber_pw privilage 15': self.usernames.users.append,
             'no username john password uber_pw privilage 15': self.usernames.remove,
-            'reload in 0:0 noconfirm': '', 'reload cancel': ''
+            'reload in 0:0 noconfirm': '', 'reload cancel': '', 'enable password blah': '',
+            'show run enable': 'enable password GDHAGRHERH'
         }
 
         self.hostname = hostname

@@ -9,14 +9,31 @@ from asa_modules.users.asa_users import AsaUsers, AsaUser
 class Asa(AsaBase):
 
     ASA_COMMANDS = {
-        'get_running_configuration': 'show run', 'reload': 'reload in {0} noconfirm', 'cancel_reload': 'reload cancel'
+        'get_running_configuration': 'show run', 'reload': 'reload in {0} noconfirm', 'cancel_reload': 'reload cancel',
+        'enable password': 'enable password {0}'
     }
+
+    @property
+    def enable_password(self):
+        if not self._enable_password:
+            self._enable_password = self.get_enable_password()
+        return self._enable_password
+
+    @enable_password.setter
+    def enable_password(self, password):
+        self.set_enable_password(password)
+        self.get_enable_password()
 
     @property
     def hostname(self):
         if not self._hostname:
             self.get_hostname()
         return self._hostname
+
+    @hostname.setter
+    def hostname(self, hostname):
+        self.set_hostname(hostname)
+        self.get_hostname()
 
     @property
     def interfaces(self):
@@ -40,6 +57,7 @@ class Asa(AsaBase):
         self._interfaces = None
         self._static_routes = None
         self._users = AsaUsers(self)
+        self._enable_password = None
 
         self._raw_configuration = None
 
@@ -83,4 +101,13 @@ class Asa(AsaBase):
         :return:
         """
         self.ssh_session.send_command(self.ASA_COMMANDS['cancel_reload'])
+        return True
+
+    def get_enable_password(self):
+        return self.ssh_session.send_command('show run enable')
+
+    def set_enable_password(self, password):
+        self.set_config_mode()
+        self.ssh_session.send_command(self.ASA_COMMANDS['enable password'].format(password))
+        self.unset_config_mode()
         return True
