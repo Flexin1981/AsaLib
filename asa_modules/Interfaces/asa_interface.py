@@ -2,20 +2,53 @@ import re
 from netaddr import IPNetwork, IPAddress
 
 
-class AsaInterfaces:
+class AsaInterfaces(object):
 
-    def __init__(self, interfaces):
-        self._interfaces = interfaces
+    ASA_INTERFACE_COMMANDS = {
+        'show': 'show run int'
+    }
 
-    def __iter__(self):
-        return self
+    def _collect_interfaces(self):
+        return self.parent.ssh_session_send_command(self.ASA_INTERFACE_COMMANDS['show'])
 
-    def next(self):
-        for key, value in self._interfaces:
-            yield value
+    @staticmethod
+    def _check_interface_type(interface):
+        if type(interface) != AsaInterface:
+            raise TypeError('Interface should be of type AsaInterface')
+
+    def _is_interface_removable(self, interface):
+        if getattr(self, interface).removable:
+            return True
+        else:
+            return False
+
+    def get_interfaces(self):
+        for interface in re.findall('(interface .*?)!', self._raw_configuration, re.DOTALL):
+            setattr(
+                self, re.search('interface (.*)', interface).group(1),
+                AsaInterface(self.parent, re.search('interface (.*)', interface).group(1))
+            )
+
+    def append(self, interface):
+        self._check_interface_type(interface)
+        setattr(self, interface.interface, interface)
+
+    def remove(self, interface_name):
+        if self._is_interface_removable(interface_name):
+            getattr(self, interface_name).delete_interface()
+            delattr(self, interface_name)
+
+    def __init__(self, parent):
+        self.parent = parent
+        self._raw_configuration = self._collect_interfaces()
+        self.get_interfaces()
 
 
-class AsaInterface:
+class AsaInterface(object):
+
+    # Todo; need to add setter commands to the AsaInterface
+    # Todo; Need to add parent to the AsaInterface object.
+    # Todo: Need to ad a non removal property so that physical interfaces cannot be removed.
 
     INTERFACE_COMMANDS = {
         'interface_configuration_mode': 'interface {0}', 'show_interface_configuration': 'show run interface {0}',
@@ -29,6 +62,10 @@ class AsaInterface:
         if not self._ip_address:
             self._ip_address = self._get_ip_address()
         return self._ip_address
+
+    @ip_address.setter
+    def ip_address(self, value):
+        self.set_ip_address(value)
 
     @property
     def security_level(self):
@@ -44,21 +81,33 @@ class AsaInterface:
 
     @property
     def state(self):
-        if not self._state:
+        if not self._is_shut:
             self._status = self._get_interface_state()
         return self._status
 
-    def __init__(self, interface_id):
-        self._id = interface_id
-        self._get_raw_configuration()
+    def __init__(
+            self, parent, interface_id, name_if=None, ip_address=None, security_level=0, is_shut=True,  removable=True
+    ):
+        self.interface = interface_id
+        self._removable = removable
 
-        self._ip_address = None
-        self._security_level = None
-        self._name_if = None
-        self._status = None
+        if self._check_parent_type(parent):
+            self._parent = parent
+
+        self._ip_address = ip_address
+        self._security_level = security_level
+        self._name_if = name_if
+        self._is_shut = is_shut
 
     def __str__(self):
         return self.name_if
+
+    @staticmethod
+    def _check_parent_type(parent):
+        from asa_lib import Asa
+        if type(parent) != Asa:
+            raise TypeError('Parent type should be an instace of Asa')
+        return True
 
     def _set_interface_configuration_mode(self):
         self._set_config_mode()
@@ -80,7 +129,7 @@ class AsaInterface:
         assert type(ip_address) == IPNetwork
 
         self._set_interface_configuration_mode()
-        self.ssh_session.send_command(
+        self.parent.ssh_session.send_command(
             self.INTERFACE_COMMANDS['set_ip_address'].format(str(ip_address.ip), str(ip_address.netmask))
         )
         self._unset_interface_configuration_mode()
@@ -128,3 +177,7 @@ class AsaInterface:
             )
         )
         self._unset_interface_configuration_mode()
+
+    def delete_interface(self):
+        # Todo; need to impliment this method.
+        pass

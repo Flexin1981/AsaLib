@@ -178,7 +178,7 @@ class MockSsh(object):
         self.usernames = MockUsernames()
         self.COMMANDS = {
             '': '', 'enable': 'password: ', 'terminal pager 0': '', 'disable': '', 'show run': self.sample_config,
-            'end': '', 'show run hostname': 'test_hostname', 'write memory': 'written', 'config terminal': '',
+            'end': '', 'show run hostname': 'hostname test-hostname', 'write memory': 'written', 'config terminal': '',
             'show run route': "route outside 0 0 10.1.2.2 1/nroute inside 192.168.1.0 255.255.255.0 192.168.1.254 1",
             'route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
             'no route outside 192.168.1.0 255.255.255.0 192.168.0.254': '',
@@ -186,7 +186,7 @@ class MockSsh(object):
             'username john password uber_pw privilage 15': self.usernames.users.append,
             'no username john password uber_pw privilage 15': self.usernames.remove,
             'reload in 0:0 noconfirm': '', 'reload cancel': '', 'enable password blah': '',
-            'show run enable': 'enable password GDHAGRHERH'
+            'show run enable': 'enable password GDHAGRHERH', 'hostname test-hostname': ''
         }
 
         self.hostname = hostname

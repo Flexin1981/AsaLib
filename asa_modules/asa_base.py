@@ -10,7 +10,7 @@ class AsaBase(object):
     COMMAND_LIST = {
         'config_mode': 'config terminal', 'end_config_mode': 'end',
         'get_hostname': 'show run hostname', 'save_config': 'write memory', 'pager_command': 'terminal pager {0}',
-        'enable': 'enable', 'disable': 'disable'
+        'enable': 'enable', 'disable': 'disable', 'set_hostname': 'hostname {0}'
     }
 
     def __init__(self, hostname, username, password, enable):
