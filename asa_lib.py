@@ -1,9 +1,9 @@
 import re
 
+from asa_modules.Interfaces.asa_interface import AsaInterfaces, AsaInterface
 from asa_modules.asa_base import AsaBase
-from asa_modules.asa_interface import AsaInterfaces, AsaInterface
 from asa_modules.routing.static_route import StaticRoutes, StaticRoute
-from asa_modules.users.asa_users import AsaUsers, AsaUser
+from asa_modules.users.asa_users import AsaUsers
 
 
 class Asa(AsaBase):
@@ -32,6 +32,8 @@ class Asa(AsaBase):
 
     @hostname.setter
     def hostname(self, hostname):
+        if not self._is_hostname_legal(hostname):
+            raise ValueError
         self.set_hostname(hostname)
         self.get_hostname()
 
@@ -71,7 +73,7 @@ class Asa(AsaBase):
 
     def set_hostname(self, hostname):
         self.set_config_mode()
-        self.ssh_session.send_command(hostname)
+        self.ssh_session.send_command(self.COMMAND_LIST['set_hostname'].format(hostname))
         self.unset_config_mode()
 
     def get_interfaces(self):
@@ -111,3 +113,18 @@ class Asa(AsaBase):
         self.ssh_session.send_command(self.ASA_COMMANDS['enable password'].format(password))
         self.unset_config_mode()
         return True
+
+    @staticmethod
+    def _is_hostname_legal(hostname):
+        if any(char in hostname for char in ['_']):
+            return False
+        return True
+
+
+if __name__ == '__main__':
+    asa = Asa('10.0.0.1', 'john', 'john', 'john')
+    asa.login()
+    asa.set_enable_mode()
+    asa.hostname = 'johns-asa'
+    print asa.hostname
+    asa.save_running_configuration()

@@ -10,7 +10,6 @@ Asa.Ssh = MockSsh
 class TestAsa(unittest.TestCase):
 
     def setUp(self):
-
         self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
         self.asa.login()
         self.asa.set_enable_mode()
@@ -35,4 +34,25 @@ class TestAsa(unittest.TestCase):
     def test_set_enable_password(self):
         self.assertEquals(
             True, self.asa.set_enable_password('blah')
+        )
+
+
+class TestAsaHostnameFeatures(unittest.TestCase):
+
+    def setUp(self):
+        self.asa = Asa('192.168.0.1', 'john', 'uber_secure_pw', '')
+        self.asa.login()
+        self.asa.set_enable_mode()
+        self.asa.set_terminal_pager(0)
+        self.asa.get_configuration()
+
+    def test_set_hostname_does_not_contain_illegal_chars(self):
+        with self.assertRaises(ValueError):
+            self.asa.hostname = "illegal_hostname"
+
+    def test_set_hostanme_changes_hostname(self):
+        self.asa.hostname = 'test-hostname'
+        self.assertEquals(
+            'test-hostname',
+            self.asa.hostname
         )

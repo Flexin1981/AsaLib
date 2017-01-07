@@ -89,7 +89,7 @@ class StaticRoute(object):
 
     @staticmethod
     def _check_type_interface_name(interface):
-        from asa_modules.asa_interface import AsaInterface
+        from asa_modules.Interfaces.asa_interface import AsaInterface
         if type(interface) == str:
             return interface
         elif type(interface) == AsaInterface:

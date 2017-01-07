@@ -68,11 +68,10 @@ class Ssh(object):
         return result_string.replace(command, '')
 
     def send_command(self, command, results=True):
+        print command
         if not self.is_logged_in():
             raise NotLoggedInError()
-
         self._write_to_channel(command)
-
         if results:
             return self._clean_command(command, self._read_from_channel())
 
