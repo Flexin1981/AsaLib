@@ -120,11 +120,3 @@ class Asa(AsaBase):
             return False
         return True
 
-
-if __name__ == '__main__':
-    asa = Asa('10.0.0.1', 'john', 'john', 'john')
-    asa.login()
-    asa.set_enable_mode()
-    asa.hostname = 'johns-asa'
-    print asa.hostname
-    asa.save_running_configuration()
